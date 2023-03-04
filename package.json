@@ -1,0 +1,25 @@
+{
+  "name": "webapp",
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx browser-sync -w"
+  },
+  "keywords": [
+    "javascript",
+    "workers",
+    "css",
+    "html",
+    "tensorflow",
+    "tfjs"
+  ],
+  "authors": [
+    "erickwendel",
+    "fredowisk"
+  ],
+  "license": "MIT",
+  "description": "JSExpert Max Gesture Controller - Semana JS Expert 7.0",
+  "devDependencies": {
+    "browser-sync": "^2.27.11"
+  }
+}
