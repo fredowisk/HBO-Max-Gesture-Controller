@@ -1,7 +1,7 @@
 import { prepareRunChecker } from "../../../../lib/shared/util.js";
 
 const { shouldRun: shouldScroll } = prepareRunChecker({ timerDelay: 400 });
-const { shouldRun: shouldClick } = prepareRunChecker({ timerDelay: 1000 });
+const { shouldRun: shouldClick } = prepareRunChecker({ timerDelay: 1500 });
 
 const MIN_WIDTH = 1080;
 
@@ -49,14 +49,27 @@ export default class HandGestureController {
   }
 
   async #gestureHandler(hands) {
-    for await (const { event, x, y } of this.#service.detectGestures(hands)) {
-      this.#eventHandler(event, x, y);
+    const eventHandler = {
+      Left: this.#leftEventHandler,
+      Right: this.#rightEventHandler,
+    };
+    for await (const {
+      handedness,
+      event,
+      x,
+      y,
+    } of this.#service.detectGestures(hands)) {
+      console.log(handedness);
+      eventHandler[handedness].call(this, event, x, y);
     }
   }
 
-  #eventHandler(event, x, y) {
-    if (event === "click") return this.#clickHandler(x, y);
+  #rightEventHandler(event) {
     if (event.includes("scroll")) return this.#scrollHandler(event);
+  }
+
+  #leftEventHandler(event, x, y) {
+    if (event === "click") return this.#clickHandler(x, y);
   }
 
   #clickHandler(x, y) {

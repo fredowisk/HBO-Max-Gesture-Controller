@@ -23,7 +23,7 @@ export default class HandGestureService {
   }
 
   async *detectGestures(predictions) {
-    for (const { keypoints3D, keypoints } of predictions) {
+    for (const { keypoints3D, keypoints, handedness } of predictions) {
       if (!keypoints3D) continue;
 
       const { gestures } = await this.#estimate(keypoints3D);
@@ -36,7 +36,7 @@ export default class HandGestureService {
 
       const { x, y } = keypoints.find(({ name }) => name === INDEX_FINGER_TIP);
 
-      yield { event: gestureName, x, y };
+      yield { handedness, event: gestureName, x, y };
     }
   }
 
