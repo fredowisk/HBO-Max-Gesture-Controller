@@ -30,8 +30,8 @@ export default class Controller {
       }
 
       const blinked = data.blinked;
-      this.#blinkCounter += blinked;
-      this.#view.togglePlayVideo();
+      this.#blinkCounter++;
+      blinked === "left" ? this.#view.playVideo() : this.#view.pauseVideo();
       console.log("Blinked!", blinked);
     };
 

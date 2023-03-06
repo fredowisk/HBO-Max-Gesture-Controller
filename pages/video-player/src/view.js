@@ -17,13 +17,13 @@ export default class View {
     return this.#canvasContext.getImageData(0, 0, width, height);
   }
 
-  togglePlayVideo() {
-    if (this.#videoElement.paused) {
-      this.#videoElement.play();
-      return;
-    }
+  playVideo() {
+    this.#videoElement.play();
+  }
 
+  pauseVideo() {
     this.#videoElement.pause();
+
   }
 
   enableButton() {
