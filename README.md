@@ -4,7 +4,8 @@ Seja bem vindo(a)! Este código foi desenvolvido durante a sétima Semana Javasc
 
 ## Preview
 
-<img width=100% src="./assets/demo-template-lg.gif">
+<img width=100% src="./assets/demo-template-lg.gif"><br>
+- [Live demo](https://fredowisk.github.io/HBO-Max-Gesture-Controller/)
 
 ## Pre-reqs
 
