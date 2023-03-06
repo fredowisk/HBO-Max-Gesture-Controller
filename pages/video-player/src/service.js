@@ -13,7 +13,7 @@ export default class Service {
 
   async loadModel() {
     this.#model = await this.#faceLandmarksDetection.load(
-      this.#faceLandmarksDetection.SupportedPackages.mediapipeFaceMesh,
+      this.#faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
       { maxFaces: 1 }
     );
   }
@@ -64,7 +64,7 @@ export default class Service {
       const blinked = leftEAR <= EAR_THRESHOLD && rightEAR <= EAR_THRESHOLD;
 
       if (!blinked) continue;
-      if(!shouldRun()) continue;
+      if (!shouldRun()) continue;
 
       return true;
     }

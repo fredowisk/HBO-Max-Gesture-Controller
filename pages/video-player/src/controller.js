@@ -45,7 +45,6 @@ export default class Controller {
 
   async init() {
     console.log("Initializing controller!");
-    this.#worker.send({ data: "READY" });
   }
 
   loop() {
@@ -54,7 +53,7 @@ export default class Controller {
     this.#worker.send(image);
     this.log("Detecting eye blink...");
 
-    setTimeout(() => this.loop(), 200);
+    setTimeout(() => this.loop(), 100);
   }
 
   log(text) {

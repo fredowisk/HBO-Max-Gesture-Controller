@@ -1,8 +1,8 @@
 import Camera from "../../../lib/shared/camera.js";
-import { supportsWorkerType } from "../../../lib/shared/util.js";
 import Controller from "./controller.js";
 import Service from "./service.js";
 import View from "./view.js";
+import { supportsWorkerType } from "../../../lib/shared/util.js";
 
 async function getWorker() {
   if (supportsWorkerType()) {
@@ -21,30 +21,32 @@ async function getWorker() {
   });
 
   const workerMock = {
-    async onmessage(video) {
+    async postMessage(video) {
       const blinked = await service.handBlinked(video);
       if (!blinked) return;
       workerMock.onmessage({ data: { blinked } });
     },
-    postMessage(msg) {},
+    onmessage(msg) {},
   };
-
   console.log("loading tf model...");
   await service.loadModel();
   console.log("tf model loaded!");
 
-  setTimeout(() => worker.postMessage({ data: "READY" }), 500);
+  setTimeout(() => worker.onmessage({ data: "READY" }), 3000);
 
   return workerMock;
 }
 
+const view = new View();
+
 const worker = await getWorker();
 
 const camera = await Camera.init();
+
 const factory = {
   async initialize() {
     return Controller.initialize({
-      view: new View(),
+      view,
       worker,
       camera,
     });
