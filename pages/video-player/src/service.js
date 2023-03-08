@@ -50,6 +50,8 @@ export default class Service {
     const predictions = await this.#estimateFaces(video);
     if (!predictions.length) return false;
 
+    if (!shouldRun()) return false;
+
     for (const prediction of predictions) {
       // Right eye parameters
       const lowerRight = prediction.annotations.rightEyeUpper0;
@@ -60,8 +62,6 @@ export default class Service {
       const upperLeft = prediction.annotations.leftEyeLower0;
       const leftEAR = this.#getEAR(upperLeft, lowerLeft);
       let blinked = false;
-
-      if (!shouldRun()) continue;
 
       if (leftEAR <= EAR_THRESHOLD) {
         blinked = "left";

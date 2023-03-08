@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "start": "npx browser-sync -w"
+    "start": "npx browser-sync -w",
+    "test": "jest --passWithNoTests --runInBand --no-cache",
+    "test-watch": "npm test -- --watch",
+    "test-cov": "npm test -- --coverage"
   },
   "keywords": [
     "javascript",
@@ -20,6 +23,11 @@
   "license": "MIT",
   "description": "JSExpert Max Gesture Controller - Semana JS Expert 7.0",
   "devDependencies": {
-    "browser-sync": "^2.27.11"
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "babel-jest": "^29.5.0",
+    "browser-sync": "^2.27.11",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0"
   }
 }
