@@ -10,12 +10,14 @@ async function getWorker() {
     const worker = new Worker("./src/worker.js", { type: "module" });
     return worker;
   }
+
   console.warn(`Your browser doesn't support esm modules on webworkers!`);
   console.warn(`Importing libraries...`);
 
   await (await import("./util.js")).default();
 
   console.warn("using worker mock instead");
+
   const service = new Service({
     faceLandmarksDetection: window.faceLandmarksDetection,
   });
@@ -27,7 +29,9 @@ async function getWorker() {
       workerMock.onmessage({ data: { blinked } });
     },
     onmessage(msg) {},
+    isMock: true,
   };
+
   console.log("loading tf model...");
   await service.loadModel();
   console.log("tf model loaded!");
@@ -36,22 +40,17 @@ async function getWorker() {
 
   return workerMock;
 }
+const view = new View()
 
-const view = new View();
-
-const [rootPath] = window.location.href.split('/pages/')
-view.setVideoSrc(`${rootPath}/assets/video.mp4`)
-
-const worker = await getWorker();
-
-const camera = await Camera.init();
+const [rootPath] = window.location.href.split("/pages/");
+view.setVideoSrc(`${rootPath}/assets/video.mp4`);
 
 const factory = {
   async initialize() {
     return Controller.initialize({
       view,
-      worker,
-      camera,
+      worker: await getWorker(),
+      camera: await Camera.init(),
     });
   },
 };

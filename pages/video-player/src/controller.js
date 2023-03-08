@@ -16,7 +16,7 @@ export default class Controller {
   static async initialize(deps) {
     const controller = new Controller(deps);
     controller.log("Not yet detecting eye blink! Click in start button!");
-    return controller.init();
+    controller.init();
   }
 
   #configureWorker(worker) {
@@ -43,7 +43,7 @@ export default class Controller {
     };
   }
 
-  async init() {
+  init() {
     console.log("Initializing controller!");
   }
 
