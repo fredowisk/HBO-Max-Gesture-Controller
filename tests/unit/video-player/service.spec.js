@@ -8,7 +8,7 @@ jest.mock("../../../lib/shared/util.js", () => ({
   }),
 }));
 
-describe.only("Video Player Service test suite", () => {
+describe("Video Player Service test suite", () => {
   let service = {};
 
   const estimateFacesMock = jest.fn().mockResolvedValue([]);

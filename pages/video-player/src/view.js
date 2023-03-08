@@ -1,11 +1,19 @@
 export default class View {
-  #btnInit = document.querySelector("#init");
-  #statusElement = document.querySelector("#status");
-  #videoFrameCanvas = document.createElement("canvas");
-  #canvasContext = this.#videoFrameCanvas.getContext("2d", {
-    willReadFrequently: true,
-  });
-  #videoElement = document.querySelector("#video");
+  #btnInit;
+  #statusElement;
+  #videoFrameCanvas;
+  #canvasContext;
+  #videoElement;
+
+  constructor() {
+    this.#btnInit = document.querySelector("#init");
+    this.#statusElement = document.querySelector("#status");
+    this.#videoFrameCanvas = document.createElement("canvas");
+    this.#canvasContext = this.#videoFrameCanvas.getContext("2d", {
+      willReadFrequently: true,
+    });
+    this.#videoElement = document.querySelector("#video");
+  }
 
   getVideoFrame(video) {
     const canvas = this.#videoFrameCanvas;
@@ -23,7 +31,6 @@ export default class View {
 
   pauseVideo() {
     this.#videoElement.pause();
-
   }
 
   enableButton() {
@@ -39,6 +46,6 @@ export default class View {
   }
 
   setVideoSrc(url) {
-    this.#videoElement.src = url
+    this.#videoElement.src = url;
   }
 }
