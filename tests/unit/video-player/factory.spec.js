@@ -27,7 +27,7 @@ jest.mock("../../../pages/video-player/src/view.js", () => {
 });
 
 jest.mock("../../../pages/video-player/src/util.js", () => {
-  return function() {}
+  return function () {};
 });
 
 describe("Factory test suite", () => {

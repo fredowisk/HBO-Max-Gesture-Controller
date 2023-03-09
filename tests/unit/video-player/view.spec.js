@@ -29,7 +29,7 @@ jest.spyOn(global, "document", "get").mockReturnValue({
   }),
 });
 
-describe.only("View test suite", () => {
+describe("View test suite", () => {
   let view;
 
   beforeEach(() => {
