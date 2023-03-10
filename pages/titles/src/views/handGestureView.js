@@ -124,6 +124,10 @@ export default class HandGestureView {
     requestAnimationFrame(fn);
   }
 
+  getCurrentPagePosition() {
+    return document.documentElement.scrollTop;
+  }
+
   scrollPage(top) {
     scroll({
       top,

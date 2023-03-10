@@ -4,6 +4,8 @@ import Service from "./service.js";
 import View from "./view.js";
 import { supportsWorkerType } from "../../../lib/shared/util.js";
 
+let worker, camera;
+
 async function getWorker() {
   if (supportsWorkerType()) {
     console.log("initializing esm workers");
@@ -29,29 +31,32 @@ async function getWorker() {
       workerMock.onmessage({ data: { blinked } });
     },
     onmessage(msg) {},
-    isMock: true,
   };
 
   console.log("loading tf model...");
   await service.loadModel();
   console.log("tf model loaded!");
 
-  setTimeout(() => worker.onmessage({ data: "READY" }), 3000);
-
   return workerMock;
 }
-const view = new View()
+const view = new View();
 
 const [rootPath] = window.location.href.split("/pages/");
 view.setVideoSrc(`${rootPath}/assets/video.mp4`);
 
 const factory = {
   async initialize() {
-    return Controller.initialize({
+    worker = await getWorker();
+    camera = await Camera.init();
+    await Controller.initialize({
       view,
-      worker: await getWorker(),
-      camera: await Camera.init(),
+      worker,
+      camera,
     });
+
+    if (!(worker instanceof Worker)) {
+      worker.onmessage({ data: "READY" });
+    }
   },
 };
 

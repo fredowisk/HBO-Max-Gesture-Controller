@@ -18,10 +18,6 @@ jest.spyOn(global, "document", "get").mockReturnValue({
   addEventListener: () => {},
 });
 
-// jest.spyOn(global, "Promise").mockImplementation(() => {
-//   return class PromiseStub {};
-// });
-
 global.Promise = class {
   constructor(cb) {
     cb(() => {});

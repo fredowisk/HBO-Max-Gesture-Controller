@@ -16,7 +16,7 @@ export default class HandGestureController {
     this.#service = service;
     this.#camera = camera;
     this.#lastDirection = {
-      y: 0,
+      y: view.getCurrentPagePosition(),
     };
   }
 

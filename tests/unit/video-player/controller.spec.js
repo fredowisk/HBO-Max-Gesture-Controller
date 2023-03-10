@@ -15,6 +15,8 @@ const cameraStub = {
   video: {},
 };
 
+console.log = () => {};
+
 setTimeout = () => {};
 
 describe("Video Player Controller test suite", () => {
