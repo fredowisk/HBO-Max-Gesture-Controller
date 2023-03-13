@@ -1,8 +1,9 @@
-export default class CardService {
-  #database = [];
-  #dbUrl = "";
+export default class CardsService {
+  #database;
+  #dbUrl;
   #cardListWorker;
   constructor({ dbUrl, cardListWorker }) {
+    this.#database = [];
     this.#dbUrl = dbUrl;
     this.#cardListWorker = cardListWorker;
   }
