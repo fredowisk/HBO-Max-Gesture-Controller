@@ -36,7 +36,7 @@ Seja bem vindo(a)! Este código foi desenvolvido durante a sétima Semana Javasc
 - [X] - Aula 01 - Diferenciar piscada de olhos entre olho direito e esquerdo e atualizar log para mostrar qual olho que piscou.
 - [X] - Aula 02 - Reconhecer gestos de mãos individuais e printar no log
 - [X] - Aula 03 - Corrigir Banner de titulo de video, para ficar atrás do desenho das mãos e se tornar clicável
-- [] - Aula 04 - Usar as mãos virtuais também no Video Player
+- [X] - Aula 04 - Usar as mãos virtuais também no Video Player
 
 Desafio plus: implementar testes unitários e alcançar 100% de coverage (avançado)
 
