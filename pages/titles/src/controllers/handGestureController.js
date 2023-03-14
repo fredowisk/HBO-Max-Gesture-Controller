@@ -1,6 +1,6 @@
 import { prepareRunChecker } from "../../../../lib/shared/util.js";
 
-const { shouldRun: shouldScroll } = prepareRunChecker({ timerDelay: 400 });
+const { shouldRun: shouldScroll } = prepareRunChecker({ timerDelay: 1000 });
 const { shouldRun: shouldClick } = prepareRunChecker({ timerDelay: 1500 });
 
 const MIN_WIDTH = 1080;

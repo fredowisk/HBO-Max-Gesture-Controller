@@ -3,7 +3,6 @@ import HandGestureController from "../../../../pages/titles/src/controllers/hand
 
 jest.mock("../../../../pages/titles/src/util/util.js", () => ({
   fingerLookupIndexes: {},
-  importer: () => {},
   knownGestures: {},
 }));
 

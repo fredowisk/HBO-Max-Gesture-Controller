@@ -11,6 +11,15 @@
     />
     <title>JSExpert Max - BlinkToPlay</title>
     <style>
+      body {
+        background-color: black;
+      }
+      canvas#hands {
+        pointer-events: none;
+        position: fixed;
+
+        z-index: 12;
+      }
       video {
         width: 95%;
         margin: 10px;
@@ -25,6 +34,7 @@
   </head>
 
   <body>
+    <canvas id="hands"></canvas>
     <div class="button-container">
       <div>
         <button type="button" disabled id="init">
@@ -34,6 +44,10 @@
       </div>
     </div>
     <video id="video" controls></video>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/gh/TSedlar/pseudo-styler@1.0.8/pseudostyler.js"
+    ></script>
     <script src="./src/index.js" type="module"></script>
   </body>
 </html>

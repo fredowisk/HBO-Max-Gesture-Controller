@@ -16,7 +16,7 @@ async function getWorker() {
   console.warn(`Your browser doesn't support esm modules on webworkers!`);
   console.warn(`Importing libraries...`);
 
-  await (await import("./util.js")).default();
+  await import("./util.js");
 
   console.warn("using worker mock instead");
 

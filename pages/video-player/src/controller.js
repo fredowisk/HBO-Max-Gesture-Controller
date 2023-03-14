@@ -11,6 +11,7 @@ export default class Controller {
     this.#blinkCounter = 0;
 
     this.#view.configureOnBtnClick(this.onBtnStart.bind(this));
+    this.#view.configureOnVideoClick(this.onVideoClick.bind(this));
   }
 
   static async initialize(deps) {
@@ -53,7 +54,7 @@ export default class Controller {
     this.#worker.send(image);
     this.log("Detecting eye blink...");
 
-    setTimeout(() => this.loop(), 100);
+    setTimeout(() => this.loop(), 500);
   }
 
   log(text) {
@@ -65,5 +66,11 @@ export default class Controller {
     this.log("Initializing detection!");
     this.#blinkCounter = 0;
     this.loop();
+  }
+
+  onVideoClick() {
+    this.#view.isVideoPaused() === true
+      ? this.#view.playVideo()
+      : this.#view.pauseVideo();
   }
 }

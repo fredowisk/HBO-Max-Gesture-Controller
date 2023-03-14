@@ -1,9 +1,5 @@
-import { fingerLookupIndexes, importer, knownGestures } from "../util/util.js";
-
-(async () => {
-  await importer();
-})();
-
+import "../util/importer.js";
+import { fingerLookupIndexes, knownGestures } from "../util/util.js";
 import HandGestureController from "../controllers/handGestureController.js";
 import HandGestureService from "../services/handGestureService.js";
 import HandGestureView from "../views/handGestureView.js";

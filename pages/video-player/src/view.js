@@ -33,12 +33,20 @@ export default class View {
     this.#videoElement.pause();
   }
 
+  isVideoPaused() {
+    return this.#videoElement.paused;
+  }
+
   enableButton() {
     this.#btnInit.disabled = false;
   }
 
   configureOnBtnClick(fn) {
     this.#btnInit.addEventListener("click", fn);
+  }
+
+  configureOnVideoClick(fn) {
+    this.#videoElement.addEventListener("click", fn);
   }
 
   log(text) {
