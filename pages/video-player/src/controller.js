@@ -69,7 +69,7 @@ export default class Controller {
   }
 
   onVideoClick() {
-    this.#view.isVideoPaused() === true
+    this.#view.isVideoPaused()
       ? this.#view.playVideo()
       : this.#view.pauseVideo();
   }

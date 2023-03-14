@@ -1,25 +1,27 @@
-import { describe, test, jest, expect } from "@jest/globals";
+import { describe, test, jest, expect, beforeEach } from "@jest/globals";
 import CardsView from "../../../../pages/titles/src/views/cardsView.js";
 
-const removeMock = jest.fn();
-
-const browseSearchStub = {
-  children: [{ remove: removeMock }, { remove: removeMock }],
+const removeMock = {
+  remove: jest.fn()
 };
 
-const eventFake = {
+const browseSearchMock = {
+  children: [removeMock, removeMock],
+};
+
+const eventMock =  {
   target: { disabled: true, value: "" },
 };
 
-const inputSearchStub = {
+const inputSearchMock = {
   value: "",
   addEventListener: jest
     .fn()
-    .mockImplementation((eventName, cb) => cb(eventFake)),
+    .mockImplementation((eventName, cb) => cb(eventMock)),
   focus: jest.fn(),
 };
 
-const searchTitleBarStub = {
+const searchTitleBarMock = {
   innerText: "",
 };
 
@@ -27,63 +29,65 @@ window.AddCardsOnBrowseSearchGrid = jest.fn();
 
 jest.spyOn(global, "document", "get").mockReturnValue({
   getElementById: (selector) => {
-    if (selector === "browseSearch") return browseSearchStub;
-    if (selector === "inputSearch") return inputSearchStub;
-    if (selector === "searchTitleBar") return searchTitleBarStub;
+    if (selector === "browseSearch") return browseSearchMock;
+    if (selector === "inputSearch") return inputSearchMock;
+    if (selector === "searchTitleBar") return searchTitleBarMock;
   },
 });
 
 describe("Cards View test suite", () => {
-  test("should call children.remove when call clearCards", () => {
-    const view = new CardsView();
+  let view;
 
+  beforeEach(() => {
+    view = new CardsView()
+  });
+
+  test("should call children.remove when call clearCards", () => {
     view.clearCards();
 
-    expect(removeMock).toHaveBeenCalledTimes(2);
+    expect(removeMock.remove).toHaveBeenCalledTimes(2);
   });
 
   test("should update inputSearch properties when call configureOnSearchInput", () => {
     const expectedCallback = jest.fn();
-    const view = new CardsView();
 
     view.configureOnSearchInput(expectedCallback);
 
-    expect(inputSearchStub.value).toStrictEqual("");
-    expect(inputSearchStub.addEventListener).toHaveBeenCalled();
+    expect(inputSearchMock.value).toStrictEqual("");
+    expect(inputSearchMock.addEventListener).toHaveBeenCalled();
     expect(expectedCallback).toHaveBeenCalled();
-    expect(eventFake.target.disabled).toBeFalsy();
-    expect(inputSearchStub.focus).toHaveBeenCalled();
+    expect(eventMock.target.disabled).toBeFalsy();
+    expect(inputSearchMock.focus).toHaveBeenCalled();
   });
 
   test("should update searchTitleBar innerText when call updateSearchTitleBarTotal", () => {
-    const totalFake = 1;
-    const expectedText = `BROWSE SEARCH (${totalFake})`;
-    const view = new CardsView();
-    view.updateSearchTitleBarTotal(totalFake);
+    const totalMock =  1;
+    const expectedText = `BROWSE SEARCH (${totalMock})`;
 
-    expect(searchTitleBarStub.innerText).toStrictEqual(expectedText);
+    view.updateSearchTitleBarTotal(totalMock);
+
+    expect(searchTitleBarMock.innerText).toStrictEqual(expectedText);
   });
 
   test("should call updateSearchTitleBarTotal when call addCards", () => {
-    const cardsFake = [];
-    const itemsPerLineFake = 5;
+    const cardsMock =  [];
+    const itemsPerLineMock =  5;
 
     const AddCardsOnBrowseSearchGridDependenciesMock = {
-      cards: cardsFake,
-      itemsPerLine: itemsPerLineFake,
+      cards: cardsMock,
+      itemsPerLine: itemsPerLineMock,
     };
 
     const updateSearchTitleBarTotalSpy = jest
       .spyOn(CardsView.prototype, "updateSearchTitleBarTotal")
       .mockReturnValue();
 
-    const view = new CardsView();
-    view.addCards(cardsFake, itemsPerLineFake);
+    view.addCards(cardsMock, itemsPerLineMock);
 
     expect(window.AddCardsOnBrowseSearchGrid).toHaveBeenCalledWith(
       AddCardsOnBrowseSearchGridDependenciesMock
     );
 
-    expect(updateSearchTitleBarTotalSpy).toHaveBeenCalledWith(cardsFake.length);
+    expect(updateSearchTitleBarTotalSpy).toHaveBeenCalledWith(cardsMock.length);
   });
 });

@@ -1,20 +1,20 @@
 import { describe, test, expect, jest } from "@jest/globals";
 import Camera from "../../../../lib/shared/camera.js";
 
-const videoObjectStub = {
+const videoObjectMock = {
   srcObject: {},
   onloadedmetadata: {},
   play: jest.fn(),
 };
 
-const navigatorStub = {
+const navigatorMock = {
   mediaDevices: {
     getUserMedia: jest.fn().mockReturnValue("streamFake"),
   },
 };
 
 jest.spyOn(global, "document", "get").mockReturnValue({
-  createElement: () => videoObjectStub,
+  createElement: () => videoObjectMock,
   addEventListener: () => {},
 });
 
@@ -24,7 +24,7 @@ global.Promise = class {
   }
 }
 
-jest.spyOn(global, "navigator", "get").mockReturnValue(navigatorStub);
+jest.spyOn(global, "navigator", "get").mockReturnValue(navigatorMock);
 
 describe("Camera test suite", () => {
   test("should start camera stream when call init", async () => {
@@ -33,9 +33,9 @@ describe("Camera test suite", () => {
     const camera = await Camera.init();
     camera.video.onloadedmetadata();
 
-    expect(navigatorStub.mediaDevices.getUserMedia).toHaveBeenCalled();
-    expect(videoObjectStub.srcObject).toStrictEqual(expectedStream);
-    expect(videoObjectStub.play).toHaveBeenCalled();
+    expect(navigatorMock.mediaDevices.getUserMedia).toHaveBeenCalled();
+    expect(videoObjectMock.srcObject).toStrictEqual(expectedStream);
+    expect(videoObjectMock.play).toHaveBeenCalled();
     expect(camera).toBeInstanceOf(Camera);
   });
 

@@ -1,5 +1,4 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
-
 import Service from "../../../pages/video-player/src/service.js";
 
 jest.mock("../../../lib/shared/util.js", () => ({
@@ -8,21 +7,23 @@ jest.mock("../../../lib/shared/util.js", () => ({
   }),
 }));
 
-describe("Video Player Service test suite", () => {
-  let service = {};
+const videoMock =  {};
 
-  const estimateFacesMock = jest.fn().mockResolvedValue([]);
+const estimateFacesMock = {
+  estimateFaces: jest.fn().mockResolvedValue([])
+};
 
-  const dependenciesMock = {
-    faceLandmarksDetection: {
-      load: jest.fn().mockResolvedValue({ estimateFaces: estimateFacesMock }),
-      SupportedPackages: {
-        mediapipeFacemesh: {},
-      },
+const dependenciesMock = {
+  faceLandmarksDetection: {
+    load: jest.fn().mockResolvedValue(estimateFacesMock),
+    SupportedPackages: {
+      mediapipeFacemesh: {},
     },
-  };
+  },
+};
 
-  const videoFake = {};
+describe("Video Player Service test suite", () => {
+  let service;
 
   beforeEach(async () => {
     service = new Service(dependenciesMock);
@@ -34,10 +35,10 @@ describe("Video Player Service test suite", () => {
   });
 
   test("should return false when call handBlinked with incorrect video", async () => {
-    const blinked = await service.handBlinked(videoFake);
+    const blinked = await service.handBlinked(videoMock);
 
     expect(blinked).toBeFalsy();
-    expect(estimateFacesMock).toHaveBeenCalled();
+    expect(estimateFacesMock.estimateFaces).toHaveBeenCalled();
   });
 
   test("should return false when call handBlinked with no eye blinking in video", async () => {
@@ -88,15 +89,14 @@ describe("Video Player Service test suite", () => {
       },
     ];
 
-    estimateFacesMock.mockResolvedValue(predictionsMock);
+    estimateFacesMock.estimateFaces.mockResolvedValue(predictionsMock);
 
-    const blinked = await service.handBlinked(videoFake);
+    const blinked = await service.handBlinked(videoMock);
 
     expect(blinked).toBeFalsy();
   });
 
   test("should return left when call handBlinked with left eye blinking in video", async () => {
-    const videoFake = {};
     const predictionsMock = [
       {
         annotations: {
@@ -145,15 +145,14 @@ describe("Video Player Service test suite", () => {
     ];
     const expectedEyeBlinked = "left";
 
-    estimateFacesMock.mockResolvedValue(predictionsMock);
+    estimateFacesMock.estimateFaces.mockResolvedValue(predictionsMock);
 
-    const blinked = await service.handBlinked(videoFake);
+    const blinked = await service.handBlinked(videoMock);
 
     expect(blinked).toStrictEqual(expectedEyeBlinked);
   });
 
   test("should return right when call handBlinked with right eye blinking in video", async () => {
-    const videoFake = {};
     const predictionsMock = [
       {
         annotations: {
@@ -203,9 +202,9 @@ describe("Video Player Service test suite", () => {
 
     const expectedEyeBlinked = "right";
 
-    estimateFacesMock.mockResolvedValue(predictionsMock);
+    estimateFacesMock.estimateFaces.mockResolvedValue(predictionsMock);
 
-    const blinked = await service.handBlinked(videoFake);
+    const blinked = await service.handBlinked(videoMock);
 
     expect(blinked).toStrictEqual(expectedEyeBlinked);
   });

@@ -1,4 +1,4 @@
-import { describe, test, jest, expect } from "@jest/globals";
+import { describe, test, jest, expect, beforeEach } from "@jest/globals";
 import HandGestureController from "../../../../pages/titles/src/controllers/handGestureController.js";
 
 jest.mock("../../../../lib/shared/util.js", () => ({
@@ -12,7 +12,7 @@ console = {
   error: jest.fn(),
 };
 
-const viewStub = {
+const viewMock = {
   scaleContext: jest.fn(),
   clearCanvas: jest.fn(),
   drawResults: jest.fn(),
@@ -29,62 +29,65 @@ function* detectGesturesMock() {
   yield gestureMock;
 }
 
-const serviceStub = {
+const serviceMock = {
   estimateHands: jest.fn().mockResolvedValue([1]),
   detectGestures: detectGesturesMock,
   initializeDetector: jest.fn(),
 };
 
-const cameraStub = {
+const cameraMock = {
   video: {
     videoWidth: 1080,
   },
 };
 
-describe("Hand Gesture Controller test suite", () => {
-  const controllerDependenciesMock = {
-    view: viewStub,
-    service: serviceStub,
-    camera: cameraStub,
-  };
+const controllerDependenciesMock = {
+  view: viewMock,
+  service: serviceMock,
+  camera: cameraMock,
+};
 
-  test("should call init when call initialize", () => {
+describe("Hand Gesture Controller test suite", () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = new HandGestureController(controllerDependenciesMock);
+  })
+
+  test("should call init when call initialize", async () => {
     const initSpy = jest
       .spyOn(HandGestureController.prototype, "init")
       .mockReturnValueOnce();
 
-    HandGestureController.initialize(controllerDependenciesMock);
+    await HandGestureController.initialize(controllerDependenciesMock);
 
     expect(initSpy).toHaveBeenCalled();
   });
 
   test("should call scaleContext when call init with a low quality video", async () => {
-    cameraStub.video.videoWidth = 720;
-    const controller = new HandGestureController(controllerDependenciesMock);
+    cameraMock.video.videoWidth = 720;
 
     await controller.init();
 
-    expect(viewStub.getCurrentPagePosition).toHaveBeenCalled();
-    expect(viewStub.scaleContext).toHaveBeenCalled();
-    expect(serviceStub.initializeDetector).toHaveBeenCalled();
-    expect(viewStub.loop).toHaveBeenCalled();
-    expect(viewStub.clickOnElement).toHaveBeenCalled();
+    expect(viewMock.getCurrentPagePosition).toHaveBeenCalled();
+    expect(viewMock.scaleContext).toHaveBeenCalled();
+    expect(serviceMock.initializeDetector).toHaveBeenCalled();
+    expect(viewMock.loop).toHaveBeenCalled();
+    expect(viewMock.clickOnElement).toHaveBeenCalled();
   });
 
   test("should call scrollDown when call scrollHandler with scroll-down event", async () => {
-    cameraStub.video.videoWidth = 1080;
+    cameraMock.video.videoWidth = 1080;
     gestureMock.handedness = "Right";
     gestureMock.event = "scroll-down";
 
     const expectedLastDirection = 400;
 
-    const controller = new HandGestureController(controllerDependenciesMock);
-
     await controller.init();
 
-    expect(serviceStub.initializeDetector).toHaveBeenCalled();
-    expect(viewStub.loop).toHaveBeenCalled();
-    expect(viewStub.scrollPage).toHaveBeenCalledWith(expectedLastDirection);
+    expect(serviceMock.initializeDetector).toHaveBeenCalled();
+    expect(viewMock.loop).toHaveBeenCalled();
+    expect(viewMock.scrollPage).toHaveBeenCalledWith(expectedLastDirection);
   });
 
   test("should call scrollUp when call scrollHandler with scroll-up event", async () => {
@@ -93,22 +96,18 @@ describe("Hand Gesture Controller test suite", () => {
 
     const expectedLastDirection = 0;
 
-    const controller = new HandGestureController(controllerDependenciesMock);
-
     await controller.init();
 
-    expect(serviceStub.initializeDetector).toHaveBeenCalled();
-    expect(viewStub.loop).toHaveBeenCalled();
-    expect(viewStub.scrollPage).toHaveBeenCalledWith(expectedLastDirection);
+    expect(serviceMock.initializeDetector).toHaveBeenCalled();
+    expect(viewMock.loop).toHaveBeenCalled();
+    expect(viewMock.scrollPage).toHaveBeenCalledWith(expectedLastDirection);
   });
 
   test("should handle the error if something bad happens inside estimateHands", async () => {
     const expectedMessage = "deu ruim**";
     const expectedError = new Error("error");
 
-    serviceStub.estimateHands.mockRejectedValue(expectedError);
-
-    const controller = new HandGestureController(controllerDependenciesMock);
+    serviceMock.estimateHands.mockRejectedValue(expectedError);
 
     await controller.init();
 

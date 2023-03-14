@@ -1,4 +1,4 @@
-import { describe, test, expect, jest } from "@jest/globals";
+import { describe, test, expect } from "@jest/globals";
 import {
   supportsWorkerType,
   prepareRunChecker,
@@ -13,7 +13,7 @@ global.Worker = class {
 };
 
 describe("SupportsWorkerType test suite", () => {
-  test("should return true when capp supportsWorkerType", () => {
+  test("should return true when call supportsWorkerType", () => {
     const supports = supportsWorkerType();
     expect(supports).toBeTruthy();
   });

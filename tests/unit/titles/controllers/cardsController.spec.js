@@ -1,23 +1,29 @@
-import { describe, test, jest, expect } from "@jest/globals";
+import { describe, test, jest, expect, beforeEach } from "@jest/globals";
 import CardsController from "../../../../pages/titles/src/controllers/cardsController.js";
 
-const viewStub = {
+const viewMock = {
   updateSearchTitleBarTotal: jest.fn(),
   addCards: jest.fn(),
   configureOnSearchInput: jest.fn(),
   clearCards: jest.fn(),
 };
 
-const serviceStub = {
+const serviceMock = {
   loadCards: jest.fn().mockResolvedValue(),
   filterTitles: jest.fn(),
 };
 
+const cardsControllerDependenciesMock = {
+  view: viewMock,
+  service: serviceMock,
+};
+
 describe("Cards Controller test suite", () => {
-  const cardsControllerDependenciesMock = {
-    view: viewStub,
-    service: serviceStub,
-  };
+  let controller;
+
+  beforeEach(() => {
+    controller = new CardsController(cardsControllerDependenciesMock);
+  })
 
   test("should call init when call initialize", async () => {
     const initSpy = jest
@@ -34,8 +40,6 @@ describe("Cards Controller test suite", () => {
       .spyOn(CardsController.prototype, "addCards")
       .mockReturnValueOnce();
 
-    const controller = new CardsController(cardsControllerDependenciesMock);
-
     await controller.init();
 
     expect(addCardsSpy).toHaveBeenCalled();
@@ -44,17 +48,15 @@ describe("Cards Controller test suite", () => {
   test("should insert cards in view when call addCards", () => {
     const keywordMock = "Chocolate";
 
-    serviceStub.filterTitles.mockReturnValueOnce([{ title: keywordMock }]);
+    serviceMock.filterTitles.mockReturnValueOnce([{ title: keywordMock }]);
 
     const expectedCards = [{ title: keywordMock }];
     const expectedItemsPerLine = 5;
 
-    const controller = new CardsController(cardsControllerDependenciesMock);
-
     controller.addCards(keywordMock);
 
-    expect(serviceStub.filterTitles).toHaveBeenCalledWith(keywordMock);
-    expect(viewStub.addCards).toHaveBeenCalledWith(
+    expect(serviceMock.filterTitles).toHaveBeenCalledWith(keywordMock);
+    expect(viewMock.addCards).toHaveBeenCalledWith(
       expectedCards,
       expectedItemsPerLine
     );
@@ -62,31 +64,27 @@ describe("Cards Controller test suite", () => {
 
   test("should call view.updateSearchTitleBarTotal when call addCards with non-existent keyword", () => {
     const expectedTotalCards = 0;
-    serviceStub.filterTitles.mockReturnValueOnce([]);
-
-    const controller = new CardsController(cardsControllerDependenciesMock);
+    serviceMock.filterTitles.mockReturnValueOnce([]);
 
     controller.addCards();
 
-    expect(viewStub.updateSearchTitleBarTotal).toHaveBeenCalledWith(
+    expect(viewMock.updateSearchTitleBarTotal).toHaveBeenCalledWith(
       expectedTotalCards
     );
-    expect(viewStub.addCards).not.toHaveBeenCalled();
+    expect(viewMock.addCards).not.toHaveBeenCalled();
   });
 
   test("should call onSearchInput when call init", async () => {
-    viewStub.configureOnSearchInput.mockImplementation((cb) => cb());
+    viewMock.configureOnSearchInput.mockImplementation((cb) => cb());
 
     const addCardsSpy = jest
       .spyOn(CardsController.prototype, "addCards")
       .mockReturnValue();
 
-    const controller = new CardsController(cardsControllerDependenciesMock);
-
     await controller.init();
 
-    expect(viewStub.configureOnSearchInput).toHaveBeenCalled();
-    expect(viewStub.clearCards).toHaveBeenCalled();
+    expect(viewMock.configureOnSearchInput).toHaveBeenCalled();
+    expect(viewMock.clearCards).toHaveBeenCalled();
     expect(addCardsSpy).toHaveBeenCalledTimes(2);
   });
 });

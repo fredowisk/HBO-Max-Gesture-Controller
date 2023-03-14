@@ -1,4 +1,4 @@
-import { describe, test, expect, jest } from "@jest/globals";
+import { describe, test, expect, jest, beforeEach } from "@jest/globals";
 
 import HandGestureView from "../../../../pages/titles/src/views/handGestureView.js";
 
@@ -6,14 +6,14 @@ const fingerLookupIndexesMock = {
   indexFinger: [0],
 };
 
-const stylerStub = {
+const stylerMock = {
   loadDocumentStyles: jest.fn(),
   toggleStyle: jest.fn().mockReturnValue(jest.fn()),
 };
 
 setTimeout = (cb) => cb();
 
-const getContextStub = {
+const getContextMock = {
   clearRect: jest.fn(),
   scale: jest.fn(),
   beginPath: jest.fn(),
@@ -26,10 +26,22 @@ const getContextStub = {
   lineJoin: "",
 };
 
-const elementFromPointStub = {
+const elementFromPointMock = {
   getBoundingClientRect: jest.fn().mockReturnValue({ left: 1, top: 1 }),
   dispatchEvent: jest.fn(),
 };
+
+const viewDependenciesMock = {
+  fingerLookupIndexes: fingerLookupIndexesMock,
+  styler: stylerMock,
+};
+
+const handsMock = [
+  {
+    keypoints: [{ name: "index_finger_tip", x: 1, y: 1 }],
+    handedness: "Left",
+  },
+];
 
 global.Path2D = class {
   moveTo() {}
@@ -43,11 +55,11 @@ global.scroll = () => {};
 global.MouseEvent = class {};
 
 jest.spyOn(global, "document", "get").mockReturnValue({
-  querySelector: () => ({ getContext: () => getContextStub }),
+  querySelector: () => ({ getContext: () => getContextMock }),
   body: {
     scrollHeight: 200,
   },
-  elementFromPoint: () => elementFromPointStub,
+  elementFromPoint: () => elementFromPointMock,
 
   documentElement: {
     scrollTop: 200,
@@ -55,25 +67,25 @@ jest.spyOn(global, "document", "get").mockReturnValue({
 });
 
 describe("Hand Gesture View test suite", () => {
-  const viewDependenciesMock = {
-    fingerLookupIndexes: fingerLookupIndexesMock,
-    styler: stylerStub,
-  };
+  let view;
 
-  test("should call canvasContext.clearRect when call clearCanvas", () => {
-    const view = new HandGestureView(viewDependenciesMock);
-    view.clearCanvas();
-
-    expect(getContextStub.clearRect).toHaveBeenCalled();
+  beforeEach(() => {
+    view = new HandGestureView(viewDependenciesMock)
   });
 
-  test("should call canvasContext.scale when call scaleContect", () => {
+  test("should call canvasContext.clearRect when call clearCanvas", () => {
+    view.clearCanvas();
+
+    expect(getContextMock.clearRect).toHaveBeenCalled();
+  });
+
+  test("should call canvasContext.scale when call scaleContext", () => {
     const expectedX = 2.2;
     const expectedY = 1.5;
-    const view = new HandGestureView(viewDependenciesMock);
+
     view.scaleContext();
 
-    expect(getContextStub.scale).toHaveBeenCalledWith(expectedX, expectedY);
+    expect(getContextMock.scale).toHaveBeenCalledWith(expectedX, expectedY);
   });
 
   test("should update canvasContext properties when call drawResults", () => {
@@ -82,29 +94,15 @@ describe("Hand Gesture View test suite", () => {
     const expectedLineWidth = 8;
     const expectedLineJoin = "round";
 
-    const handsMock = [
-      {
-        keypoints: [{ name: "index_finger_tip", x: 1, y: 1 }],
-        handedness: "Left",
-      },
-    ];
-
-    const view = new HandGestureView(viewDependenciesMock);
     view.drawResults(handsMock);
 
-    expect(getContextStub.fillStyle).toStrictEqual(expectedFillStyle);
-    expect(getContextStub.strokeStyle).toStrictEqual(expectedStrokeStyle);
-    expect(getContextStub.lineWidth).toStrictEqual(expectedLineWidth);
-    expect(getContextStub.lineJoin).toStrictEqual(expectedLineJoin);
+    expect(getContextMock.fillStyle).toStrictEqual(expectedFillStyle);
+    expect(getContextMock.strokeStyle).toStrictEqual(expectedStrokeStyle);
+    expect(getContextMock.lineWidth).toStrictEqual(expectedLineWidth);
+    expect(getContextMock.lineJoin).toStrictEqual(expectedLineJoin);
   });
 
   test("should call drawJoints when call drawResults", () => {
-    const handsMock = [
-      {
-        keypoints: [{ name: "index_finger_tip", x: 1, y: 1 }],
-        handedness: "Left",
-      },
-    ];
 
     const [
       {
@@ -120,23 +118,16 @@ describe("Hand Gesture View test suite", () => {
       endAngle: 2 * Math.PI,
     };
 
-    const view = new HandGestureView(viewDependenciesMock);
     view.drawResults(handsMock);
 
-    expect(getContextStub.beginPath).toHaveBeenCalled();
-    expect(getContextStub.arc).toHaveBeenCalledWith(
+    expect(getContextMock.beginPath).toHaveBeenCalled();
+    expect(getContextMock.arc).toHaveBeenCalledWith(
       ...Object.values(expectedArcParams)
     );
-    expect(getContextStub.fill).toHaveBeenCalled();
+    expect(getContextMock.fill).toHaveBeenCalled();
   });
 
   test("should call drawFingersAndHoverElements when call drawResults", () => {
-    const handsMock = [
-      {
-        keypoints: [{ name: "index_finger_tip", x: 1, y: 1 }],
-        handedness: "Left",
-      },
-    ];
 
     const [
       {
@@ -147,21 +138,14 @@ describe("Hand Gesture View test suite", () => {
     const moveToSpy = jest.spyOn(Path2D.prototype, "moveTo");
     const lineToSpy = jest.spyOn(Path2D.prototype, "lineTo");
 
-    const view = new HandGestureView(viewDependenciesMock);
     view.drawResults(handsMock);
 
     expect(moveToSpy).toHaveBeenCalledWith(x, y);
     expect(lineToSpy).toHaveBeenCalledWith(x, y);
-    expect(getContextStub.stroke).toHaveBeenCalled();
+    expect(getContextMock.stroke).toHaveBeenCalled();
   });
 
   test("should call hoverElements when call drawResults", () => {
-    const handsMock = [
-      {
-        keypoints: [{ name: "index_finger_tip", x: 1, y: 1 }],
-        handedness: "Left",
-      },
-    ];
 
     const [
       {
@@ -174,49 +158,48 @@ describe("Hand Gesture View test suite", () => {
     const elementFromPointSpy = jest
       .spyOn(document, "elementFromPoint")
 
-    const view = new HandGestureView(viewDependenciesMock);
     view.drawResults(handsMock);
 
     expect(elementFromPointSpy).toHaveBeenCalledWith(x, y);
 
-    expect(stylerStub.toggleStyle).toHaveBeenCalledWith(
-      elementFromPointStub,
+    expect(stylerMock.toggleStyle).toHaveBeenCalledWith(
+      elementFromPointMock,
       expectedBehavior
     );
   });
 
   test("should dispatch a click event when call clickOnElement", () => {
-    const x = 1;
-    const y = 1;
+    const [
+      {
+        keypoints: [{ x, y }],
+      },
+    ] = handsMock;
 
     const elementFromPointSpy = jest.spyOn(document, "elementFromPoint");
 
-    const view = new HandGestureView(viewDependenciesMock);
     view.clickOnElement(x, y);
 
     expect(elementFromPointSpy).toHaveBeenCalledWith(x, y);
-    expect(elementFromPointStub.getBoundingClientRect).toHaveBeenCalled();
-    expect(elementFromPointStub.dispatchEvent).toHaveBeenCalled();
+    expect(elementFromPointMock.getBoundingClientRect).toHaveBeenCalled();
+    expect(elementFromPointMock.dispatchEvent).toHaveBeenCalled();
   });
 
   test("should call requestAnimationFrame when call loop", () => {
-    const expectedParam = jest.fn();
+    const expectedLoopParam = jest.fn();
 
     const requestAnimationFrameSpy = jest.spyOn(
       global,
       "requestAnimationFrame"
     );
 
-    const view = new HandGestureView(viewDependenciesMock);
-    view.loop(expectedParam);
+    view.loop(expectedLoopParam);
 
-    expect(requestAnimationFrameSpy).toHaveBeenCalledWith(expectedParam);
+    expect(requestAnimationFrameSpy).toHaveBeenCalledWith(expectedLoopParam);
   });
 
   test("should return the current scroll value when call getCurrentPagePosition", () => {
     const expectedScrollValue = 200;
 
-    const view = new HandGestureView(viewDependenciesMock);
     const position = view.getCurrentPagePosition();
 
     expect(position).toStrictEqual(expectedScrollValue);
@@ -230,7 +213,6 @@ describe("Hand Gesture View test suite", () => {
     };
     const scrollSpy = jest.spyOn(global, "scroll");
 
-    const view = new HandGestureView(viewDependenciesMock);
     view.scrollPage(expectedTop);
 
     expect(scrollSpy).toHaveBeenCalledWith(expectedScrollParams);

@@ -1,8 +1,8 @@
-import { describe, test, jest, expect } from "@jest/globals";
+import { describe, test, jest, expect, beforeEach } from "@jest/globals";
 
 import HandGestureService from "../../../../pages/titles/src/services/handGestureService.js";
 
-const fingerPoseStub = {
+const fingerPoseMock = {
   GestureEstimator: class {
     async estimate() {
       return Promise.resolve({
@@ -20,7 +20,7 @@ const estimateHandsMock = {
   estimateHands: jest.fn().mockResolvedValue([1]),
 };
 
-const handPoseDetectionStub = {
+const handPoseDetectionMock = {
   SupportedModels: {
     MediaPipeHands: {},
   },
@@ -30,32 +30,34 @@ const handPoseDetectionStub = {
 const handsVersionMock = 2.4;
 const knownGesturesMock = {};
 
+const serviceDependenciesMock = {
+  fingerPose: fingerPoseMock,
+  handPoseDetection: handPoseDetectionMock,
+  handsVersion: handsVersionMock,
+  knownGestures: knownGesturesMock,
+};
+
 describe("Hand Gesture Service test suite", () => {
-  const serviceDependenciesMock = {
-    fingerPose: fingerPoseStub,
-    handPoseDetection: handPoseDetectionStub,
-    handsVersion: handsVersionMock,
-    knownGestures: knownGesturesMock,
-  };
+  let service;
+
+  beforeEach(() => {
+    service = new HandGestureService(serviceDependenciesMock)
+  })
 
   test("should return a handPoseDetector when call initializeDetector", async () => {
     const expectedDetector = estimateHandsMock;
 
-    const service = new HandGestureService(serviceDependenciesMock);
-
     const detector = await service.initializeDetector();
 
-    expect(handPoseDetectionStub.createDetector).toHaveBeenCalled();
+    expect(handPoseDetectionMock.createDetector).toHaveBeenCalled();
     expect(detector).toStrictEqual(expectedDetector);
   });
 
   test("should return the detected hands when call estimateHands", async () => {
-    const videoFake = {};
-
-    const service = new HandGestureService(serviceDependenciesMock);
+    const videoMock =  {};
 
     await service.initializeDetector();
-    const hands = await service.estimateHands(videoFake);
+    const hands = await service.estimateHands(videoMock);
 
     expect(estimateHandsMock.estimateHands).toHaveBeenCalled();
     expect(hands).toHaveLength(1);
@@ -78,11 +80,9 @@ describe("Hand Gesture Service test suite", () => {
     };
 
     const estimateSpy = jest.spyOn(
-      fingerPoseStub.GestureEstimator.prototype,
+      fingerPoseMock.GestureEstimator.prototype,
       "estimate"
     );
-
-    const service = new HandGestureService(serviceDependenciesMock);
 
     const gestureInformation = [];
 

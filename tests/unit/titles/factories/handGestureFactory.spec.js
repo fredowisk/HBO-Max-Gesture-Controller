@@ -1,6 +1,8 @@
 import { describe, test, expect, jest } from "@jest/globals";
 import HandGestureController from "../../../../pages/titles/src/controllers/handGestureController.js";
 
+jest.mock("../../../../pages/titles/src/util/importer.js", () => {});
+
 jest.mock("../../../../pages/titles/src/util/util.js", () => ({
   fingerLookupIndexes: {},
   knownGestures: {},
@@ -37,7 +39,6 @@ describe("Hand Gesture Factory test suite", () => {
     const { default: factory } = await import(
       "../../../../pages/titles/src/factories/handGestureFactory.js"
     );
-
     const spyInitialize = jest.spyOn(HandGestureController, "initialize");
 
     await factory.initialize();

@@ -1,35 +1,42 @@
 import { describe, test, expect, jest, beforeEach } from "@jest/globals";
 import View from "../../../pages/video-player/src/view.js";
 
-class ImageDataStub {}
+class ImageDataMock {}
 
-const buttonObjectStub = {
+const buttonObjectMock = {
   disabled: true,
   addEventListener: jest.fn(),
   innerHTML: "Not yet detecting eye blink",
 };
 
-const videoObjectStub = {
+const videoObjectMock = {
   play: jest.fn(),
   pause: jest.fn(),
-  src: './'
-}
+  paused: true,
+  addEventListener: jest.fn(),
+  src: "./",
+};
+
+const contextMethodsMock = {
+  drawImage: jest.fn(),
+  getImageData: jest.fn().mockReturnValue(new ImageDataMock(1, 1)),
+};
+
+const getContextMock = {
+  getContext: () => contextMethodsMock,
+};
 
 jest.spyOn(global, "document", "get").mockReturnValue({
   querySelector: (selector) => {
-    if (selector !== "#video") return buttonObjectStub;
+    if (selector !== "#video") return buttonObjectMock;
 
-    return videoObjectStub;
+    return videoObjectMock;
   },
-  createElement: () => ({
-    getContext: () => ({
-      drawImage: () => {},
-      getImageData: () => new ImageDataStub(1, 1),
-    }),
-  }),
+
+  createElement: () => getContextMock,
 });
 
-describe("View test suite", () => {
+describe("Video Player View test suite", () => {
   let view;
 
   beforeEach(() => {
@@ -37,31 +44,52 @@ describe("View test suite", () => {
   });
 
   test("should return ImageData when call getVideoFrame", () => {
-    const videoFake = { videoWidth: 1, videoHeight: 1 };
+    const videoMock = { videoWidth: 1, videoHeight: 1 };
+    const contextParamsMock = [
+      0,
+      0,
+      videoMock.videoWidth,
+      videoMock.videoHeight,
+    ];
 
-    const contextImageData = view.getVideoFrame(videoFake);
+    const contextImageData = view.getVideoFrame(videoMock);
 
-    expect(contextImageData).toBeInstanceOf(ImageDataStub);
+    expect(contextMethodsMock.drawImage).toHaveBeenCalledWith(
+      videoMock,
+      ...contextParamsMock
+    );
+
+    expect(contextMethodsMock.getImageData).toHaveBeenCalledWith(
+      ...contextParamsMock
+    );
+
+    expect(contextImageData).toBeInstanceOf(ImageDataMock);
   });
 
   test("should call videoElement.play when call playVideo", () => {
     view.playVideo();
 
-    expect(videoObjectStub.play).toHaveBeenCalled();
+    expect(videoObjectMock.play).toHaveBeenCalled();
   });
 
   test("should call videoElement.pause when call pauseVideo", () => {
     view.pauseVideo();
 
-    expect(videoObjectStub.pause).toHaveBeenCalled();
+    expect(videoObjectMock.pause).toHaveBeenCalled();
+  });
+
+  test("should return true when call isVideoPaused and video is paused", () => {
+    const isPaused = view.isVideoPaused();
+
+    expect(isPaused).toBeTruthy();
   });
 
   test("should enable init button when call enableButton", () => {
-    expect(buttonObjectStub.disabled).toStrictEqual(true);
+    expect(buttonObjectMock.disabled).toStrictEqual(true);
 
     view.enableButton();
 
-    expect(buttonObjectStub.disabled).toStrictEqual(false);
+    expect(buttonObjectMock.disabled).toStrictEqual(false);
   });
 
   test("should call addEventListener when call configureOnBtnClick", () => {
@@ -70,7 +98,19 @@ describe("View test suite", () => {
 
     view.configureOnBtnClick(configurationMock);
 
-    expect(buttonObjectStub.addEventListener).toHaveBeenCalledWith(
+    expect(buttonObjectMock.addEventListener).toHaveBeenCalledWith(
+      eventType,
+      configurationMock
+    );
+  });
+
+  test("should call addEventListener when call configureOnVideoClick", () => {
+    const configurationMock = () => {};
+    const eventType = "click";
+
+    view.configureOnVideoClick(configurationMock);
+
+    expect(videoObjectMock.addEventListener).toHaveBeenCalledWith(
       eventType,
       configurationMock
     );
@@ -81,14 +121,14 @@ describe("View test suite", () => {
 
     view.log(expectedStatus);
 
-    expect(buttonObjectStub.innerHTML).toStrictEqual(expectedStatus);
+    expect(buttonObjectMock.innerHTML).toStrictEqual(expectedStatus);
   });
 
   test("should update the video src when call setVideoSrc", () => {
-    const expectedSrc = "../../../assets/video.map4";
+    const expectedSrc = "../../../assets/video.mp4";
 
     view.setVideoSrc(expectedSrc);
 
-    expect(videoObjectStub.src).toStrictEqual(expectedSrc);
+    expect(videoObjectMock.src).toStrictEqual(expectedSrc);
   });
 });
